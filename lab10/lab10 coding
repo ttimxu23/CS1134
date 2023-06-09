@@ -1,0 +1,202 @@
+"""cs1134 lab 10 coding questions"""
+
+from DoublyLinkedList import DoublyLinkedList
+#1: LinkedStack
+class LinkedStack:
+    def __init__(self):
+        self.data = DoublyLinkedList()
+        self.n = 0
+    def __len__(self):
+        return self.n
+    def is_empty(self):
+        return self.n == 0
+    def push(self, elem):
+        self.n += 1
+        self.data.add_last(elem)
+    def top(self):
+        if self.is_empty():
+            raise Exception("Stack is empty")
+        return self.data.trailer.prev.data
+    def pop(self):
+        if self.is_empty():
+            raise Exception("Stack is empty")
+        return self.data.delete_last()
+
+def main1():
+    s = LinkedStack()
+    s.push(1)
+    s.push(2)
+    s.push(3)
+    print(s.top())#3
+    print(s.pop())#3
+    print(s.top())#2
+    print(s.pop())#2
+#main1()
+
+#Number 2 is in the DoublyLinkedList.py file
+def main2():
+    dll = DoublyLinkedList()
+    dll.add_first(3)
+    dll.add_last(7)
+    dll.add_last(5)
+    print(dll[0]) # 3 (should iterate from the header)
+    print(dll[1]) # 7 (either way works)
+    print(dll[2]) # 5 (should iterate from the trailer)
+    print(dll[3]) # IndexError
+#main2()
+
+#3
+class MidStack:
+    def __init__(self):
+        self.data = DoublyLinkedList()
+        self.n = 0
+        self.mid = None
+    def __len__(self):
+        return self.n
+    def is_empty(self):
+        return self.n == 0
+    def push(self, val):
+        self.n += 1
+        self.data.add_last(val)
+        if len(self) == 1:
+            self.mid = self.data.header.next
+        elif len(self)%2 == 1:
+            self.mid = self.mid.next
+    def top(self):
+        if self.is_empty():
+            raise Exception("Stack is empty")
+        return self.trailer.prev.data
+    def pop(self):
+        if self.is_empty():
+            raise Exception("Stack is empty")
+        val = self.data.delete_last()
+        self.n -= 1
+        if len(self)%2 == 0:
+            self.mid = self.mid.prev
+        return val
+    def mid_push(self, val):
+        self.n += 1
+        self.data.add_after(self.mid, val)
+
+def main3():
+    s = MidStack()
+    s.push(1)
+    s.push(2)
+    s.push(4)
+    s.push(5)
+    s.mid_push(3)
+    print(s.pop())
+    print(s.pop())
+    print(s.pop())
+    print(s.pop())
+    print(s.pop())
+#main3()
+
+#4
+class SinglyLinkedList:
+    class Node:
+        def __init(self, data=None, next=None):
+            self.data = data
+            self.next = next
+        def disconnect(self):
+            self.data = None
+            self.next = None
+    def __init__(self):
+        self.header = None
+        self.tail = None
+        self.n = 0
+    def __len__(self):
+        return self.n 
+    def is_empty(self):
+        return self.n == 0
+    def add_after(self, node, val):
+        self.n += 1
+        new_node = SinglyLinkedList.Node()
+        new_node.data = val
+        prev_node = node
+        next_node = node.next
+        prev_node.next = new_node
+        new_node.next = next_node
+        if node == self.tail:
+            self.tail = node
+    def add_first(self, val):
+        new_node = SinglyLinkedList.Node()
+        new_node.data = val
+        if self.is_empty():
+            self.header = new_node
+            self.tail = new_node
+        else:
+            old_head = self.header
+            self.header = new_node
+            self.header.next = old_head
+        self.n += 1
+    def add_last(self, val):
+        new_node = SinglyLinkedList.Node()
+        new_node.data = val
+        if self.is_empty():
+            self.header = new_node
+            self.tail = new_node
+        else:
+            self.tail.next = new_node
+            self.tail = new_node
+        self.n += 1
+    def __iter__(self):
+        cursor = self.header
+        for i in range(self.n-1):
+            yield cursor.data
+            cursor = cursor.next
+        yield cursor.data
+    def delete_first(self):
+        if self.is_empty():
+            raise Exception("List is empty")
+        new_head = self.header.next
+        val = self.header
+        self.header.disconnect()
+        self.header = new_head
+        self.n -= 1
+        return val
+    def delete_last(self):
+        if self.is_empty():
+            raise Exception("List is empty")
+        self.tail = None
+        self.n -= 1
+        cursor = self.header
+        for i in range(self.n-1):
+            cursor = cursor.next
+        self.tail = cursor
+    def __repr__(self):
+        return "[" + " -> ".join([str(elem) for elem in self]) + "]"
+    def reverse(self):
+        prev = None
+        cursor = self.header
+        while cursor.next:
+            next = cursor.next
+            cursor.next = prev
+            cursor = next
+            prev = cursor
+        self.tail = self.header
+        self.header = cursor
+
+
+
+
+
+def main4():
+    sll = SinglyLinkedList()
+    sll.add_first(3)
+    sll.add_first(2)
+    sll.add_first(1)
+    sll.add_after(sll.header, 1.5)
+    sll.add_last(4)
+    sll.add_last(5)
+    sll.add_last(6)
+    print(sll)
+    sll.reverse()
+    print(sll)
+    sll.delete_first()
+    sll.delete_last()
+    sll.delete_last()
+    print(sll)
+    
+    
+main4()
